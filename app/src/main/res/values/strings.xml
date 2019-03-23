@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SharedList</string>
+    <string name="btn_login">Entrar</string>
+    <string name="txt_input_username">Usuário</string>
+    <string name="txt_input_password">Senha</string>
+    <string name="img_desc_cart">Carrinho</string>
+
+    <string name="tab_1">Listas</string>
+    <string name="tab_2">Produtos</string>
+    <string name="tab_3">Configurações</string>
+
+    <string name="fragment_title_shopping_list">Minhas Listas de Compras</string>
+    <string name="fragment_title_groups">Meus Grupos</string>
+    <string name="fragment_title_products">Meus Produtos</string>
+    <string name="fragment_title_settings">Configurações</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+</resources>
