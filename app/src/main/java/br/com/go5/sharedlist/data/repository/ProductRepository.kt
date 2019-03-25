@@ -20,6 +20,11 @@ class ProductRepository: KoinComponent {
         }
     }
 
+    fun delete(product: Product) {
+        doAsync {
+            productDao.delete(product)
+        }
+    }
     fun findAll(): LiveData<List<Product>> {
         var products: LiveData<List<Product>>? = null
         if (utils.isConnectedToInternet()) {

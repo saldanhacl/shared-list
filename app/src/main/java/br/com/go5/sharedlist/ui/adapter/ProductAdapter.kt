@@ -8,20 +8,16 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import br.com.go5.sharedlist.R
 import br.com.go5.sharedlist.data.model.Product
-import br.com.go5.sharedlist.utils.Utils
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
 
 
 class ProductAdapter(private var products: List<Product>,
                      private val listener: OnItemSelected) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>()  {
 
-    private var isSelecting: Boolean = false
+    var selectedIndex: Int = -1
 
     interface OnItemSelected {
         fun onSelect(position: Int, showMenu: Boolean)
     }
-
 
     fun loadItems(newItems: List<Product>) {
         products = newItems
@@ -29,7 +25,10 @@ class ProductAdapter(private var products: List<Product>,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ProductViewHolder(inflater, parent)
+        val viewHolder = ProductViewHolder(inflater, parent)
+        viewHolder.setIsRecyclable(false)
+        return viewHolder
+
     }
 
     override fun getItemCount(): Int {
@@ -59,6 +58,7 @@ class ProductAdapter(private var products: List<Product>,
         fun bind(product: Product, position: Int, listener: OnItemSelected) {
             txtName?.text = product.name
             setListeners(listener, position)
+            if (selectedIndex == position) changeColorToSelected()
         }
 
         private fun setListeners(listener: OnItemSelected, position: Int) {
@@ -70,14 +70,14 @@ class ProductAdapter(private var products: List<Product>,
 //            }true
 
             constLayout?.setOnClickListener {
-                if (isSelected) {
-                    isSelected = false
+                if (selectedIndex == position) {
                     listener.onSelect(position, false)
-                    changeColorToDefault()
+                    selectedIndex = -1
+                    notifyDataSetChanged()
                 } else {
-                    isSelected = true
+                    selectedIndex = position
                     listener.onSelect(position, true)
-                    changeColorToSelected()
+                    notifyDataSetChanged()
                 }
             }
         }

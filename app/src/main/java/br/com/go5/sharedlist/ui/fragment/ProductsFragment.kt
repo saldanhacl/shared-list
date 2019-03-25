@@ -15,13 +15,19 @@ import br.com.go5.sharedlist.data.model.Product
 import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
 import br.com.go5.sharedlist.ui.activity.MainActivity
 import br.com.go5.sharedlist.ui.adapter.ProductAdapter
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.getInputField
+import com.afollestad.materialdialogs.input.input
 import kotlinx.android.synthetic.main.fragment_products.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
 
+    private lateinit var selectedProduct: Product
+
     override fun onSelect(position: Int, showMenu: Boolean) {
         if (showMenu) {
+            selectedProduct = products[position]
             cardOptions.visibility = View.VISIBLE
         } else {
             cardOptions.visibility = View.GONE
@@ -47,7 +53,9 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
     }
 
     private fun setupListeners() {
-
+        btnDelete.setOnClickListener {
+            viewModel.delete(selectedProduct)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -56,8 +64,8 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
         setupUi(view)
 
         viewModel.findAll().observe(this, Observer {
-            Log.d("ADD", "New product")
-            adapter.loadItems(it ?: emptyList())
+            products = it
+            adapter.loadItems(products)
             adapter.notifyDataSetChanged()
         })
 

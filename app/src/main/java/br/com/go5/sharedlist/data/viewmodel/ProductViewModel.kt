@@ -18,6 +18,10 @@ class ProductViewModel: ViewModel(), KoinComponent {
         products = productRepository.findAll()
     }
 
+    fun delete(product: Product) {
+        productRepository.delete(product)
+    }
+
     fun insert(product: Product) {
         productRepository.insert(product)
     }
