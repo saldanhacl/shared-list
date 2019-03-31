@@ -3,9 +3,8 @@ package br.com.go5.sharedlist.di
 import androidx.room.Room
 import br.com.go5.sharedlist.data.repository.ProductRepository
 import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
+import br.com.go5.sharedlist.network.RetrofitInit
 import br.com.go5.sharedlist.persistence.AppDatabase
-import br.com.go5.sharedlist.persistence.dao.ProductDao
-import br.com.go5.sharedlist.persistence.dao.ProductDao_Impl
 import br.com.go5.sharedlist.utils.Utils
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.ext.koin.viewModel
@@ -22,5 +21,6 @@ object AppModule {
             .build() }
         single { get<AppDatabase>().productDao() }
         viewModel { ProductViewModel() }
+        single { RetrofitInit() }
     }
 }

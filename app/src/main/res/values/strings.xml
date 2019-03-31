@@ -22,5 +22,8 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="submit">Salvar</string>
+    <string name="agree">Ok</string>
+    <string name="alert">Atenção</string>
+    <string name="server_error">Erro ao conectar com o servidor. Tente novamente mais tarde.</string>
 
 </resources>

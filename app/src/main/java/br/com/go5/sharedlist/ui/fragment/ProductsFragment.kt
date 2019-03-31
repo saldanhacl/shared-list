@@ -39,7 +39,6 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
     private val viewModel by viewModel<ProductViewModel>()
     private var products: List<Product> = emptyList()
     private lateinit var recyclerView: RecyclerView
-    private var count: Long = 200
 
     companion object {
         fun newInstance(): ProductsFragment {
