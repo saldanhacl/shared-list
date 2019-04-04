@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import br.com.go5.sharedlist.R
 import br.com.go5.sharedlist.ui.fragment.ProductsFragment
 import br.com.go5.sharedlist.ui.fragment.SettingsFragment
-import br.com.go5.sharedlist.ui.fragment.ShoppingListFragment
+import br.com.go5.sharedlist.ui.fragment.GroupsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.navShoppingList -> {
-                val shoppingListFragment = ShoppingListFragment.newInstance()
+            R.id.navGroups -> {
+                val shoppingListFragment = GroupsFragment.newInstance()
                 openFragment(shoppingListFragment)
                 return@OnNavigationItemSelectedListener true
             }
@@ -44,12 +44,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupUI () {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        val shoppingListFragment = ShoppingListFragment.newInstance()
+        val shoppingListFragment = GroupsFragment.newInstance()
         openFragment(shoppingListFragment)
         actionBar = supportActionBar!!
     }
 
-    private fun openFragment(fragment: Fragment) {
+    fun openFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.container, fragment)
         transaction.addToBackStack(null)

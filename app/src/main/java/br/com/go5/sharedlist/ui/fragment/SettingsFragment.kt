@@ -7,7 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 
 import br.com.go5.sharedlist.R
+import br.com.go5.sharedlist.persistence.UserInfo
+import br.com.go5.sharedlist.ui.activity.LoginActivity
 import br.com.go5.sharedlist.ui.activity.MainActivity
+import mehdi.sakout.aboutpage.AboutPage
+import mehdi.sakout.aboutpage.Element
+import org.jetbrains.anko.intentFor
 
 class SettingsFragment : Fragment() {
 
@@ -18,13 +23,23 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_settings, container, false)
-        setupUI()
-        return view
+        setFragmentTitle()
+        return AboutPage(activity!!)
+            .isRTL(false)
+            .setImage(R.mipmap.ic_launcher)
+            .setDescription("Aplicativo feito para a disciplina de Trabalho Interdisciplinar de Software. Desenvolvido pelos alunos do 5° período do curso de Engenharia de Software da Puc Minas")
+            .addItem(Element()
+                .setTitle("Sair")
+                .setOnClickListener {
+                    signOut()
+                })
+            .create()
     }
 
-    private fun setupUI() {
-        setFragmentTitle()
+    private fun signOut() {
+        UserInfo.isLogged = false
+        UserInfo.username = ""
+        startActivity(activity?.intentFor<LoginActivity>())
     }
 
     private fun setFragmentTitle() {

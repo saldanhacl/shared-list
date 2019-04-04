@@ -5,8 +5,12 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Product (
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     val id: Long,
     val name: String,
     val price: Double
-)
+) {
+    fun getPriceString(): String {
+        return price.toString()
+    }
+}

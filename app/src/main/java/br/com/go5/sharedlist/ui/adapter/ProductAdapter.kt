@@ -20,7 +20,7 @@ class ProductAdapter(private var products: List<Product>,
     }
 
     fun loadItems(newItems: List<Product>) {
-        products = newItems
+        products += newItems
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -49,7 +49,7 @@ class ProductAdapter(private var products: List<Product>,
         private var constLayout: ConstraintLayout? = null
 
         init {
-            txtName = itemView.findViewById(R.id.txtName)
+            txtName = itemView.findViewById(R.id.txtShoppingListName)
             txtPrice = itemView.findViewById(R.id.txtPrice)
             constLayout = itemView.findViewById(R.id.constLayout)
             isSelected = false
@@ -57,6 +57,7 @@ class ProductAdapter(private var products: List<Product>,
 
         fun bind(product: Product, position: Int, listener: OnItemSelected) {
             txtName?.text = product.name
+            txtPrice?.text = "R$" + product.price.toString()
             setListeners(listener, position)
             if (selectedIndex == position) changeColorToSelected()
         }

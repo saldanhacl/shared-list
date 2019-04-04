@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">SharedList</string>
+    <string name="app_name">Will List</string>
     <string name="btn_login">Entrar</string>
     <string name="txt_input_username">Usuário</string>
     <string name="txt_input_password">Senha</string>
     <string name="img_desc_cart">Carrinho</string>
 
-    <string name="tab_1">Listas</string>
+    <string name="tab_1">Grupos</string>
     <string name="tab_2">Produtos</string>
     <string name="tab_3">Configurações</string>
 
@@ -25,5 +25,11 @@
     <string name="agree">Ok</string>
     <string name="alert">Atenção</string>
     <string name="server_error">Erro ao conectar com o servidor. Tente novamente mais tarde.</string>
+    <string name="sign_out_option">Sair</string>
+    <string name="hint_group_name">Nome do Grupo</string>
+    <string name="hint_shopping_list_name">Nome da Lista</string>
+    <string name="create_group_card_title">Criar Grupo</string>
+    <string name="create_shoppingList_card_title">Criar Lista de Compras</string>
+    <string name="fragment_title_shoppingLists">Minhas Listas</string>
 
 </resources>

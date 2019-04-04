@@ -5,16 +5,16 @@ import android.os.Bundle
 import br.com.go5.sharedlist.R
 import br.com.go5.sharedlist.data.model.User
 import br.com.go5.sharedlist.network.RetrofitInit
+import br.com.go5.sharedlist.persistence.UserInfo
 import org.jetbrains.anko.intentFor
 
 import kotlinx.android.synthetic.main.activity_login.*
-import org.jetbrains.anko.toast
 import org.koin.android.ext.android.inject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import org.json.JSONObject
 import com.afollestad.materialdialogs.MaterialDialog
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.runOnUiThread
+import retrofit2.HttpException
 
 
 class LoginActivity : AppCompatActivity() {
@@ -25,58 +25,63 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         spinner.hide()
+        checkUserIsLoggedIn()
 
         btnLogin.setOnClickListener {
-            signIn()
+            validateLogin()
         }
     }
 
-    private fun signIn() {
-        validateLogin()
-//        startActivity(intentFor<MainActivity>())
+    private fun checkUserIsLoggedIn() {
+        if (UserInfo.isLogged) {
+            startActivity(intentFor<MainActivity>())
+            this.finish()
+        }
     }
 
     private fun validateLogin() {
-//        val username = editTextUsername.text.toString()
-//        val password = editTextPassword.text.toString()
-        val username = "lucas.saldanha@sga.pucminas.br"
-        val password = "123"
+        val username = editTextUsername.text.toString()
+        val password = editTextPassword.text.toString()
+//        val username = "lucas.saldanha@sga.pucminas.br"
+//        val password = "123"
 
         spinner.show()
-        retrofit.userService().login(username, password).enqueue(
-            object: Callback<User?> {
-
-                override fun onFailure(call: Call<User?>, t: Throwable) {
-                    spinner.hide()
-                    MaterialDialog(this@LoginActivity).show {
-                        title(R.string.alert)
-                        message(R.string.server_error)
-                        positiveButton(R.string.agree)
-                    }
+        GlobalScope.launch {
+            try {
+                val response = retrofit.userService().login(username, password).await()
+                signIn(response)
+            } catch (exception: HttpException) {
+//                val jsonError = JSONObject(exception.response().errorBody()?.string())
+//                showAlertDialog(jsonError.getString("message"))
+                runOnUiThread {
+                    showAlertDialog("Usuário/Senha incorreto(s)")
                 }
-
-                override fun onResponse(call: Call<User?>, response: Response<User?>) {
+            } catch (exception: Exception) {
+                runOnUiThread {
+                    showAlertDialog(getString(R.string.server_error))
+                }
+            } finally {
+                runOnUiThread {
                     spinner.hide()
-                    if (response.isSuccessful) {
-                        startActivity(intentFor<MainActivity>())
-                    } else {
-                        try {
-                            val jsonError = JSONObject(response.errorBody()?.string())
-                            MaterialDialog(this@LoginActivity).show {
-                                title(R.string.alert)
-                                message(text = jsonError.getString("message"))
-                                positiveButton(R.string.agree)
-                            }
-                        } catch (e: Exception) {
-                            MaterialDialog(this@LoginActivity).show {
-                                title(R.string.alert)
-                                message(text = e.message)
-                                positiveButton(R.string.agree)
-                            }
-                        }
-                    }
                 }
             }
-        )
+        }
     }
+
+    private fun showAlertDialog(message: String) {
+        MaterialDialog(this@LoginActivity).show {
+            title(R.string.alert)
+            message(text = message)
+            positiveButton(R.string.agree)
+        }
+    }
+
+    private fun signIn(user: User) {
+        UserInfo.isLogged = true
+        UserInfo.username = user.email
+        UserInfo.id = user.id
+        startActivity(intentFor<MainActivity>())
+        this.finish()
+    }
+
 }

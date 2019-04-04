@@ -4,7 +4,14 @@
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
-                                                   tools:context=".ui.fragment.ShoppingListFragment">
+                                                   tools:context=".ui.fragment.GroupsFragment">
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:src="@drawable/ic_add_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true" android:id="@+id/fabAdd" android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     <androidx.constraintlayout.widget.Guideline
             android:orientation="horizontal"
             android:layout_width="wrap_content"
@@ -52,5 +59,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/recyclerView" app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
+    </androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

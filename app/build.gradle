@@ -33,6 +33,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha02'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha02'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.google.android.material:material:1.1.0-alpha04'
 
     // Anko
@@ -44,10 +45,6 @@ dependencies {
 
     // Lifecycle
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
-
-    // Dagger
-//    kapt "com.google.dagger:dagger-compiler:$dagger_version"
-//    implementation "com.google.dagger:dagger:$dagger_version"
 
     // Koin
     implementation "org.koin:koin-core:$koin_version"
@@ -61,13 +58,26 @@ dependencies {
     // LastAdapter
     implementation 'com.github.nitrico.lastadapter:lastadapter:2.3.0'
     kapt 'com.android.databinding:compiler:3.1.4'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
     // MatDialog
     implementation 'com.afollestad.material-dialogs:input:2.5.0'
 
     // Loading
     implementation 'com.wang.avi:library:2.1.3'
+
+    // KotPref
+    implementation 'com.chibatching.kotpref:kotpref:2.7.0'
+    implementation 'com.chibatching.kotpref:initializer:2.7.0'
+
+    // AboutPage
+    implementation 'com.github.medyo:android-about-page:1.2.5'
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.0-alpha'
+    implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2'
+    configurations {
+        compile.exclude group: 'org.jetbrains.kotlinx', module: 'atomicfu-common'
+    }
 
 
 }

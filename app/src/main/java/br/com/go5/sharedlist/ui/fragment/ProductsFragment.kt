@@ -13,17 +13,23 @@ import androidx.recyclerview.widget.RecyclerView
 import br.com.go5.sharedlist.R
 import br.com.go5.sharedlist.data.model.Product
 import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
+import br.com.go5.sharedlist.persistence.UserInfo
 import br.com.go5.sharedlist.ui.activity.MainActivity
 import br.com.go5.sharedlist.ui.adapter.ProductAdapter
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_products.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
 
     private lateinit var selectedProduct: Product
+    private var count: Long = 55L
 
     override fun onSelect(position: Int, showMenu: Boolean) {
         if (showMenu) {
@@ -52,8 +58,19 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
     }
 
     private fun setupListeners() {
-        btnDelete.setOnClickListener {
-            viewModel.delete(selectedProduct)
+        fabAdd.setOnClickListener {
+            MaterialDialog(activity!!).show {
+                customView(R.layout.layout_create_product)
+                title(text = "Criar Produto")
+                positiveButton {
+                    val view = it.getCustomView()
+                    val productNameInput: TextInputEditText = view.findViewById(R.id.txtProductName)
+                    val productPriceINput: TextInputEditText = view.findViewById(R.id.txtPrice)
+                    adapter.loadItems(listOf(Product(count++, productNameInput.text.toString(),
+                                            productPriceINput.text.toString().toDouble())))
+                    adapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -62,11 +79,14 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
 
         setupUi(view)
 
-        viewModel.findAll().observe(this, Observer {
-            products = it
+//        viewModel.findAll().observe(this, Observer {
+            products = listOf(
+                Product(123, "Banana", 3.99),
+                            Product(1234, "Maçã", 2.99)
+            )
             adapter.loadItems(products)
             adapter.notifyDataSetChanged()
-        })
+//        })
 
         return view
     }
