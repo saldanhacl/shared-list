@@ -31,5 +31,6 @@
     <string name="create_group_card_title">Criar Grupo</string>
     <string name="create_shoppingList_card_title">Criar Lista de Compras</string>
     <string name="fragment_title_shoppingLists">Minhas Listas</string>
+    <string name="warning">Aviso</string>
 
 </resources>

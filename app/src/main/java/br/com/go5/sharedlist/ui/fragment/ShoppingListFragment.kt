@@ -1,117 +1,90 @@
 package br.com.go5.sharedlist.ui.fragment
 
+import android.graphics.Canvas
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.go5.sharedlist.R
-import br.com.go5.sharedlist.data.model.Product
 import br.com.go5.sharedlist.data.model.ShoppingList
 import br.com.go5.sharedlist.data.viewmodel.ShoppingListViewModel
-import br.com.go5.sharedlist.network.ShoppingListService
-import br.com.go5.sharedlist.network.RetrofitInit
-import br.com.go5.sharedlist.persistence.UserInfo
+import br.com.go5.sharedlist.data.viewmodel.ViewModelFactory
 import br.com.go5.sharedlist.ui.activity.MainActivity
-import br.com.go5.sharedlist.ui.adapter.ShoppingListAdapter
+import br.com.go5.sharedlist.ui.activity.ShoppingListDetailActivity
+import br.com.go5.sharedlist.ui.adapter.ShoppingListQuickAdapter
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
+import com.chad.library.adapter.base.listener.OnItemSwipeListener
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_shopping_list.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import retrofit2.Call
-import retrofit2.HttpException
-import retrofit2.Response
-import javax.security.auth.callback.Callback
+import org.jetbrains.anko.intentFor
 
-class ShoppingListFragment : Fragment(), ShoppingListAdapter.OnItemSelected  {
+class ShoppingListsFragment : Fragment()  {
 
-    private lateinit var adapter: ShoppingListAdapter
-    private lateinit var linearLayoutManager: LinearLayoutManager
-    private val viewModel by viewModel<ShoppingListViewModel>()
-    var shoppingLists: List<ShoppingList> = emptyList()
+    private lateinit var viewModel: ShoppingListViewModel
+    private lateinit var adapter: ShoppingListQuickAdapter
     private lateinit var recyclerView: RecyclerView
-    private val retrofit: RetrofitInit by inject()
-    private var count: Long = 55L
-
-    private lateinit var selectedShoppingList: ShoppingList
-
-
-    override fun onSelect(position: Int, showMenu: Boolean) {
-        if (showMenu) {
-            selectedShoppingList = shoppingLists[position]
-            cardOptions.visibility = View.VISIBLE
-        } else {
-            cardOptions.visibility = View.GONE
-        }
-    }
+    private var shoppingLists: List<ShoppingList> = emptyList()
 
     companion object {
-        fun newInstance(): ShoppingListFragment {
-            return ShoppingListFragment()
+        fun newInstance(): ShoppingListsFragment {
+            return ShoppingListsFragment()
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
+        val emptyView = inflater.inflate(R.layout.empty_list, container, false)
+        val mainActivity = activity as MainActivity
+        shoppingLists = mainActivity.selectedGroup!!.listasDeCompras
         setFragmentTitle()
-        setupUi(view)
+        setupUi(view,emptyView)
         return view
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        GlobalScope.launch { getShoppingLists() }
+        viewModel = createViewModel()
         setupListeners()
     }
 
-    private suspend fun getShoppingLists() {
-        spinner.show()
-        try {
-//            val responseShoppingLists = viewModel.findAllByUser(UserInfo.id)
-//            if (!responseShoppingLists.isNullOrEmpty()) {
-//                shoppingLists = responseShoppingLists
-//                adapter.loadItems(shoppingLists)
-//            }
-            adapter.loadItems(listOf(ShoppingList(123, "Compras do mês"), ShoppingList(1234, "Compras da semana")))
-        } catch (exception: HttpException) {
-            showAlertDialog(getString(R.string.server_error))
-        } catch (exception: Exception) {
-            showAlertDialog(getString(R.string.server_error))
-        } finally {
-            hideSpinner()
-        }
+    private fun createViewModel(): ShoppingListViewModel {
+        val factory = ViewModelFactory()
+        return ViewModelProviders.of(this, factory).get(ShoppingListViewModel::class.java)
     }
 
-    private fun hideSpinner() {
-        activity?.runOnUiThread {
-            spinner.hide()
-        }
-    }
-
-    private fun setupUi(view: View) {
+    private fun setupUi(view: View, emptyView: View) {
         recyclerView = view.findViewById(R.id.rvShoppingLists)
-        linearLayoutManager = LinearLayoutManager(activity)
-        recyclerView.layoutManager = linearLayoutManager
-        adapter = ShoppingListAdapter(shoppingLists, this)
+        recyclerView.layoutManager = LinearLayoutManager(activity!!)
+        setupAdapter(emptyView)
         recyclerView.adapter = adapter
-
         setFragmentTitle()
     }
 
+    private fun setupAdapter(emptyView: View) {
+        adapter = ShoppingListQuickAdapter(shoppingLists)
+        adapter.emptyView = emptyView
+        val mItemDragAndSwipeCallback = ItemDragAndSwipeCallback(adapter)
+        val mItemTouchHelper = ItemTouchHelper(mItemDragAndSwipeCallback)
+        mItemTouchHelper.attachToRecyclerView(recyclerView)
+
+        mItemDragAndSwipeCallback.setSwipeMoveFlags(ItemTouchHelper.START or ItemTouchHelper.END)
+        adapter.enableSwipeItem()
+        adapter.setOnItemSwipeListener(onItemSwipeListener)
+        adapter.onItemClickListener = onCLickListener
+    }
+
     private fun setupListeners() {
-        btnDelete.setOnClickListener {
-            viewModel.delete(selectedShoppingList)
-        }
         fabAdd.setOnClickListener {
             MaterialDialog(activity!!).show {
                 customView(R.layout.layout_create_shopping_list)
@@ -119,35 +92,33 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.OnItemSelected  {
                 positiveButton {
                     val view = it.getCustomView()
                     val shoppingListNameInput: TextInputLayout = view.findViewById(R.id.txtShoppingListName)
-                    adapter.loadItems(listOf(
-                        ShoppingList(count++, shoppingListNameInput.editText?.text.toString())
-                    ))
-                    adapter.notifyDataSetChanged()
-//                    createShoppingList(shoppingListNameInput.editText?.text.toString(), UserInfo.id)
+                    createShoppingList(shoppingListNameInput.editText?.text.toString())
                 }
             }
         }
     }
 
-    private fun createShoppingList(shoppingListName: String, creator: Long) {
-        GlobalScope.launch {
-            try {
-                viewModel.createInServer(shoppingListName, creator)
-            } catch (exception: HttpException) {
+    private fun createShoppingList(shoppingListName: String) {
+        val activity = activity as MainActivity
+        viewModel.createInServer(shoppingListName, activity.selectedGroup!!.id).observe(activity, Observer {
+            if (it == null) {
                 showAlertDialog(getString(R.string.server_error))
-            } catch (exception: Exception) {
-                showAlertDialog(getString(R.string.server_error))
-            } finally {
-                getShoppingLists()
+            } else {
+                viewModel.getGroupById(activity.selectedGroup!!.id).observe(activity, Observer {
+                    shoppingLists = it.listasDeCompras
+                    adapter.setNewData(shoppingLists)
+                })
             }
-        }
+        })
     }
 
     private fun showAlertDialog(message: String) {
-        MaterialDialog(activity!!).show {
-            title(R.string.alert)
-            message(text = message)
-            positiveButton(R.string.agree)
+        activity?.runOnUiThread {
+            MaterialDialog(activity!!).show {
+                title(R.string.alert)
+                message(text = message)
+                positiveButton(R.string.agree)
+            }
         }
     }
 
@@ -155,6 +126,36 @@ class ShoppingListFragment : Fragment(), ShoppingListAdapter.OnItemSelected  {
         val mainActivity = activity as MainActivity
         val title = mainActivity.getString(R.string.fragment_title_shoppingLists)
         mainActivity.actionBar.title = title
+    }
+
+
+    val onItemSwipeListener = object : OnItemSwipeListener {
+        override fun onItemSwipeStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            print(pos)
+        }
+        override fun clearView(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            print(pos)
+        }
+        override fun onItemSwipeMoving(canvas: Canvas, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, isCurrentlyActive: Boolean) {
+            canvas.drawColor(ContextCompat.getColor(activity!!, R.color.colorAccent))
+        }
+
+        override fun onItemSwiped(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            if (pos != -1) {
+                viewModel.delete(shoppingLists[pos]).observe(activity!!, Observer {
+                    print(it)
+                })
+            }
+        }
+
+    }
+
+    val onCLickListener = object : BaseQuickAdapter.OnItemClickListener {
+        override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
+            startActivity(activity?.intentFor<ShoppingListDetailActivity>(
+                "shoppingList" to shoppingLists[position]
+            ))
+        }
     }
 
 }

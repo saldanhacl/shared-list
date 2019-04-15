@@ -1,9 +1,11 @@
 package br.com.go5.sharedlist.di
 
 import androidx.room.Room
+import br.com.go5.sharedlist.data.repository.CategoryRepository
 import br.com.go5.sharedlist.data.repository.GroupRepository
 import br.com.go5.sharedlist.data.repository.ProductRepository
 import br.com.go5.sharedlist.data.repository.ShoppingListRepository
+import br.com.go5.sharedlist.data.viewmodel.CategoryViewModel
 import br.com.go5.sharedlist.data.viewmodel.GroupViewModel
 import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
 import br.com.go5.sharedlist.data.viewmodel.ShoppingListViewModel
@@ -22,15 +24,16 @@ val appModule: Module = module {
     viewModel { ProductViewModel() }
     viewModel { GroupViewModel() }
     viewModel { ShoppingListViewModel() }
+    viewModel { CategoryViewModel() }
     single { Room.databaseBuilder(androidApplication(), AppDatabase::class.java, "shared-list-database")
         .build() }
 
     single { get<AppDatabase>().productDao() }
-    single { get<AppDatabase>().groupDao() }
     single { get<AppDatabase>().shoppingListDao() }
     single { ProductRepository() }
     single { GroupRepository() }
     single { ShoppingListRepository() }
+    single { CategoryRepository() }
 }
 
 val viewModelModule: Module = module {
@@ -42,7 +45,7 @@ val databaseModule: Module = module {
         .build() }
 
     single { get<AppDatabase>().productDao() }
-    single { get<AppDatabase>().groupDao() }
+//    single { get<AppDatabase>().groupDao() }
     single { ProductRepository() }
     single { GroupRepository() }
 }

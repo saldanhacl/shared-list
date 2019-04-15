@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                   xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="product" type="br.com.go5.sharedlist.data.model.Product"/>
+    </data>
+
+<androidx.constraintlayout.widget.ConstraintLayout
                                                    android:layout_width="match_parent"
-                                                   android:minHeight="80dp"
                                                    android:layout_height="wrap_content" android:id="@+id/constLayout"
                                                    android:background="@android:color/white">
 
     <TextView
-            android:text="Product Name"
+            android:text="@{product.name}"
             android:layout_width="0dp"
             android:layout_height="wrap_content" android:id="@+id/txtShoppingListName"
             app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -17,7 +22,7 @@
             android:textColor="@android:color/black" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"/>
     <TextView
-            android:text="Price"
+            android:text="@{product.priceString}"
             android:layout_width="0dp"
             android:layout_height="wrap_content" android:id="@+id/txtPrice"
             app:layout_constraintTop_toBottomOf="@+id/txtShoppingListName"
@@ -28,11 +33,12 @@
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toTopOf="@id/divider"/>
     <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp" tools:srcCompat="@drawable/ic_shopping_basket"
+            android:layout_width="24dp"
+            android:layout_height="24dp" tools:srcCompat="@drawable/ic_home_black_24dp"
             android:id="@+id/imageView" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" app:srcCompat="@drawable/ic_shopping_basket"/>
+            android:layout_marginStart="16dp" app:srcCompat="@drawable/ic_home_black_24dp"
+            android:visibility="invisible"/>
     <View
             android:id="@+id/divider"
             android:layout_width="0dp"
@@ -43,3 +49,4 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView" android:layout_marginStart="8dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

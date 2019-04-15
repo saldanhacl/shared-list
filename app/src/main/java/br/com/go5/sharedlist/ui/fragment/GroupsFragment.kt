@@ -1,47 +1,39 @@
 package br.com.go5.sharedlist.ui.fragment
 
+import android.graphics.Canvas
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.go5.sharedlist.R
 import br.com.go5.sharedlist.data.model.Group
 import br.com.go5.sharedlist.data.viewmodel.GroupViewModel
-import br.com.go5.sharedlist.network.RetrofitInit
+import br.com.go5.sharedlist.data.viewmodel.ViewModelFactory
 import br.com.go5.sharedlist.persistence.UserInfo
 import br.com.go5.sharedlist.ui.activity.MainActivity
-import br.com.go5.sharedlist.ui.adapter.GroupAdapter
+import br.com.go5.sharedlist.ui.adapter.GroupQuickAdapter
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
+import com.chad.library.adapter.base.listener.OnItemSwipeListener
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_groups.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.jetbrains.anko.runOnUiThread
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import retrofit2.HttpException
 
-class GroupsFragment : Fragment(), GroupAdapter.OnItemSelected  {
+class GroupsFragment : Fragment()  {
 
-    private lateinit var adapter: GroupAdapter
-    private lateinit var linearLayoutManager: LinearLayoutManager
-    private val viewModel by viewModel<GroupViewModel>()
-    var groups: List<Group> = emptyList()
+    private lateinit var viewModel: GroupViewModel
+    private lateinit var adapter: GroupQuickAdapter
     private lateinit var recyclerView: RecyclerView
-    private val retrofit: RetrofitInit by inject()
-
-    private lateinit var selectedGroup: Group
-
-
-    override fun onSelect(position: Int) {
-        val shoppingListFragment = ShoppingListFragment.newInstance()
-        (activity as MainActivity).openFragment(shoppingListFragment)
-    }
+    private var groups: List<Group> = emptyList()
 
     companion object {
         fun newInstance(): GroupsFragment {
@@ -51,40 +43,34 @@ class GroupsFragment : Fragment(), GroupAdapter.OnItemSelected  {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_groups, container, false)
+        val emptyView = inflater.inflate(R.layout.empty_list, container, false)
         setFragmentTitle()
-        setupUi(view)
+        setupUi(view,emptyView)
         return view
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        GlobalScope.launch { getGroups() }
+        viewModel = createViewModel()
+        getGroups()
         setupListeners()
     }
 
-    private suspend fun getGroups() {
-        activity?.runOnUiThread {
-            spinner.show()
-        }
-        try {
-            val responseGroups = viewModel.findAllByUser(UserInfo.id)
-            if (!responseGroups.isNullOrEmpty()) {
-                groups = responseGroups
-                adapter.loadItems(groups)
+    private fun createViewModel(): GroupViewModel {
+        val factory = ViewModelFactory()
+        return ViewModelProviders.of(this, factory).get(GroupViewModel::class.java)
+    }
+
+
+    private  fun getGroups() {
+        viewModel.findAllByUser(UserInfo.id)?.observe(this, Observer<List<Group>> {
+            if (!it.isNullOrEmpty()){
+                groups = it
+                adapter.setNewData(it)
             }
-        } catch (exception: HttpException) {
-            activity?.runOnUiThread {
-                showAlertDialog(getString(R.string.server_error))
-            }
-        } catch (exception: Exception) {
-            activity?.runOnUiThread {
-                showAlertDialog(getString(R.string.server_error))
-            }
-        } finally {
-//            adapter.loadItems(listOf(Group(1, "Faculdade"), Group(2, "Casa")))
+            recyclerView.visibility = View.VISIBLE
             hideSpinner()
-        }
+        })
     }
 
     private fun hideSpinner() {
@@ -93,20 +79,31 @@ class GroupsFragment : Fragment(), GroupAdapter.OnItemSelected  {
         }
     }
 
-    private fun setupUi(view: View) {
+    private fun setupUi(view: View, emptyView: View) {
         recyclerView = view.findViewById(R.id.rvGroups)
-        linearLayoutManager = LinearLayoutManager(activity)
-        recyclerView.layoutManager = linearLayoutManager
-        adapter = GroupAdapter(groups, this)
+        recyclerView.visibility = View.INVISIBLE
+        recyclerView.layoutManager = LinearLayoutManager(activity!!)
+        setupAdapter(emptyView)
         recyclerView.adapter = adapter
-
         setFragmentTitle()
     }
 
+    private fun setupAdapter(emptyView: View) {
+        adapter = GroupQuickAdapter(groups)
+        adapter.emptyView = emptyView
+
+        val mItemDragAndSwipeCallback = ItemDragAndSwipeCallback(adapter)
+        val mItemTouchHelper = ItemTouchHelper(mItemDragAndSwipeCallback)
+        mItemTouchHelper.attachToRecyclerView(recyclerView)
+
+        mItemDragAndSwipeCallback.setSwipeMoveFlags(ItemTouchHelper.START or ItemTouchHelper.END)
+        adapter.enableSwipeItem()
+        adapter.setOnItemSwipeListener(onItemSwipeListener)
+
+        adapter.onItemClickListener = onClickListener
+    }
+
     private fun setupListeners() {
-        btnDelete.setOnClickListener {
-            viewModel.delete(selectedGroup)
-        }
         fabAdd.setOnClickListener {
             MaterialDialog(activity!!).show {
                 customView(R.layout.layout_create_group)
@@ -121,35 +118,57 @@ class GroupsFragment : Fragment(), GroupAdapter.OnItemSelected  {
     }
 
     private fun createGroup(groupName: String, creator: Long) {
-        GlobalScope.launch {
-            try {
-                viewModel.createInServer(groupName, creator)
-            } catch (exception: HttpException) {
-                activity?.runOnUiThread {
-                    showAlertDialog(getString(R.string.server_error))
-                }
-            } catch (exception: Exception) {
-                activity?.runOnUiThread {
-                    showAlertDialog(getString(R.string.server_error))
-                }
-            } finally {
-                getGroups()
+        viewModel.createInServer(groupName, creator).observe(activity!!, Observer {
+            if (it == null) {
+                showAlertDialog(getString(R.string.server_error))
             }
-        }
+            getGroups()
+        })
     }
 
     private fun showAlertDialog(message: String) {
-//        MaterialDialog(activity!!).show {
-//            title(R.string.alert)
-//            message(text = message)
-//            positiveButton(R.string.agree)
-//        }
+        activity?.runOnUiThread {
+            MaterialDialog(activity!!).show {
+                title(R.string.alert)
+                message(text = message)
+                positiveButton(R.string.agree)
+            }
+        }
     }
 
     private fun setFragmentTitle() {
         val mainActivity = activity as MainActivity
         val title = mainActivity.getString(R.string.fragment_title_groups)
         mainActivity.actionBar.title = title
+    }
+
+    // LISTENERS
+
+    val onItemSwipeListener = object : OnItemSwipeListener {
+        override fun onItemSwipeStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            print(pos)
+        }
+        override fun clearView(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            print(pos)
+        }
+        override fun onItemSwipeMoving(canvas: Canvas, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, isCurrentlyActive: Boolean) {
+            canvas.drawColor(ContextCompat.getColor(activity!!, R.color.colorAccent))
+        }
+
+        override fun onItemSwiped(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            if (pos != -1) {
+                viewModel.delete(groups[pos]).observe(activity!!, Observer {
+                    print(it)
+                })
+            }
+        }
+    }
+
+    val onClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+        val activity = activity as MainActivity
+        activity.selectedGroup = groups[position]
+        val shoppingListFragment = ShoppingListsFragment.newInstance()
+        activity.openFragment(shoppingListFragment)
     }
 
 }
