@@ -110,7 +110,7 @@ class GroupsFragment : Fragment()  {
                 title(R.string.create_group_card_title)
                 positiveButton {
                     val view = it.getCustomView()
-                    val groupNameInput: TextInputLayout = view.findViewById(R.id.txtShoppingListName)
+                    val groupNameInput: TextInputLayout = view.findViewById(R.id.txtGroupName)
                     createGroup(groupNameInput.editText?.text.toString(), UserInfo.id)
                 }
             }

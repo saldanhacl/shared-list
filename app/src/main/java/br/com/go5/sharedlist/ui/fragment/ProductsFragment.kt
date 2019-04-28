@@ -16,6 +16,7 @@ import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
 import br.com.go5.sharedlist.persistence.UserInfo
 import br.com.go5.sharedlist.ui.activity.MainActivity
 import br.com.go5.sharedlist.ui.adapter.ProductAdapter
+import br.com.go5.sharedlist.ui.adapter.ProductQuickAdapter
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
@@ -40,7 +41,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
         }
     }
 
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: ProductQuickAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel by viewModel<ProductViewModel>()
     private var products: List<Product> = emptyList()
@@ -66,9 +67,8 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
                     val view = it.getCustomView()
                     val productNameInput: TextInputEditText = view.findViewById(R.id.txtProductName)
                     val productPriceINput: TextInputEditText = view.findViewById(R.id.txtPrice)
-                    adapter.loadItems(listOf(Product(count++, productNameInput.text.toString(),
-                                            productPriceINput.text.toString().toDouble())))
-                    adapter.notifyDataSetChanged()
+                    adapter.setNewData(listOf(Product(count++, productNameInput.text.toString(),
+                        productPriceINput.text.toString().toDouble())))
                 }
             }
         }
@@ -84,8 +84,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
                 Product(123, "Banana", 3.99),
                             Product(1234, "Maçã", 2.99)
             )
-            adapter.loadItems(products)
-            adapter.notifyDataSetChanged()
+            adapter.setNewData(products)
 //        })
 
         return view
@@ -95,7 +94,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
         recyclerView = view.findViewById(R.id.recyclerView)
         linearLayoutManager = LinearLayoutManager(activity)
         recyclerView.layoutManager = linearLayoutManager
-        adapter = ProductAdapter(products, this)
+        adapter = ProductQuickAdapter(products, false)
         recyclerView.adapter = adapter
 
         setFragmentTitle()

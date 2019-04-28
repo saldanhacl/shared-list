@@ -12,7 +12,8 @@ interface UserService {
     @POST("/users/login")
     fun login(
         @Query("email") email: String,
-        @Query("senha") password: String): Deferred<User>
+        @Query("senha") password: String,
+        @Query("FCMToken") FCMToken: String): Deferred<User>
 
     @GET("/users/{id}/groups")
     fun getGroups(@Path("id") userId: Long): Call<List<Group>>

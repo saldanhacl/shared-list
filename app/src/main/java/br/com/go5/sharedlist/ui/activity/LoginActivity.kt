@@ -42,13 +42,14 @@ class LoginActivity : AppCompatActivity() {
     private fun validateLogin() {
         val username = editTextUsername.text.toString()
         val password = editTextPassword.text.toString()
+        val fcmToken = UserInfo.fcmToken
 //        val username = "lucas.saldanha@sga.pucminas.br"
 //        val password = "123"
 
         spinner.show()
         GlobalScope.launch {
             try {
-                val response = retrofit.userService().login(username, password).await()
+                val response = retrofit.userService().login(username, password, fcmToken).await()
                 signIn(response)
             } catch (exception: HttpException) {
 //                val jsonError = JSONObject(exception.response().errorBody()?.string())

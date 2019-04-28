@@ -54,7 +54,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
-                        android:hint="@string/txt_input_username" android:textAlignment="center"
+                        android:hint="@string/txt_input_username"
+                        android:inputType="textEmailAddress"
                         android:id="@+id/editTextUsername"/>
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
@@ -69,7 +70,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionGo"
-                        android:hint="@string/txt_input_password" android:textAlignment="center"
+                        android:hint="@string/txt_input_password"
+                        android:inputType="textPassword"
                         android:textAllCaps="false" android:id="@+id/editTextPassword"/>
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,45 +7,97 @@
         android:layout_height="match_parent"
         tools:context=".ui.activity.ShoppingListDetailActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" android:id="@+id/contentLayout" android:visibility="invisible">
+    <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/contentLayout" android:visibility="invisible">
 
-        <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp" tools:srcCompat="@drawable/ic_groceries"
-                android:id="@+id/imgShoppingList" app:layout_constraintTop_toTopOf="parent"
+            <TextView
+                    android:text="List Name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:id="@+id/txtShoppingListName"
+                    android:fontFamily="@font/roboto" android:textSize="28sp"
+                    android:textColor="@android:color/black" android:layout_marginEnd="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:textStyle="bold" android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="24dp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                    android:overScrollMode="never"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:id="@+id/rvProducts"
+                    android:layout_marginTop="16dp" app:layout_constraintTop_toBottomOf="@+id/txtShoppingListName"/>
+            <androidx.recyclerview.widget.RecyclerView
+                    android:overScrollMode="never"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:id="@+id/rvComments"
+                    app:layout_constraintTop_toBottomOf="@+id/txtCommentLable"
+                    android:layout_marginTop="16dp"/>
+
+            <com.wang.avi.AVLoadingIndicatorView
+                    android:id="@+id/spinner"
+                    app:indicatorColor="@color/colorAccent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:indicatorName="BallPulseIndicator"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"/>
+            <TextView
+                    android:text="Comentários"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/roboto"
+                    android:id="@+id/txtCommentLable" app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="16dp" app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="16dp" app:layout_constraintTop_toBottomOf="@+id/rvProducts"
+                    android:layout_marginTop="16dp" android:textSize="28sp" android:textColor="@android:color/black"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="wrap_content"
+                                                       android:layout_height="wrap_content"
+                                                       app:layout_constraintBottom_toBottomOf="parent"
+                                                       app:layout_constraintEnd_toEndOf="parent"
+                                                       android:layout_marginBottom="32dp"
+                                                       android:layout_marginEnd="24dp">
+
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="16dp" app:srcCompat="@drawable/ic_groceries"
-                android:layout_marginTop="16dp"
-        />
-        <TextView
-                android:text="List Name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" android:id="@+id/txtShoppingListName"
-                android:fontFamily="@font/roboto" android:textSize="24sp"
-                android:textColor="@android:color/darker_gray" android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toEndOf="@+id/imgShoppingList"
-                android:layout_marginStart="8dp"
-                app:layout_constraintTop_toTopOf="@+id/imgShoppingList"
-                app:layout_constraintBottom_toBottomOf="@+id/imgShoppingList"
-                android:textStyle="bold"/>
-        <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="0dp"
-                android:layout_height="0dp" android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@+id/imgShoppingList" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/rvCategories"/>
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/fabAdd" app:fab_addButtonColorNormal="@color/colorAccent"
+                app:fab_addButtonColorPressed="@color/colorAccent" app:fab_addButtonPlusIconColor="@color/white">
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_icon="@drawable/ic_shopping_white_24dp"
+                    android:id="@+id/fabAddProduct" app:fab_colorNormal="@color/colorAccent"
+                    app:fab_title="Adicionar Produto" app:fabSize="mini" app:fab_colorPressed="@color/colorAccent"/>
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_icon="@drawable/ic_message_white_24dp"
+                    android:id="@+id/fabAddComment" app:fab_colorNormal="@color/colorAccent"
+                    app:fab_title="Adicionar Comentário" app:fabSize="mini" app:fab_colorPressed="@color/colorAccent"/>
+
+        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.wang.avi.AVLoadingIndicatorView
-            android:id="@+id/spinner"
-            app:indicatorColor="@color/colorAccent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:indicatorName="BallPulseIndicator"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -49,7 +49,7 @@ class ProductAdapter(private var products: List<Product>,
         private var constLayout: ConstraintLayout? = null
 
         init {
-            txtName = itemView.findViewById(R.id.txtShoppingListName)
+            txtName = itemView.findViewById(R.id.txtProductName)
             txtPrice = itemView.findViewById(R.id.txtPrice)
             constLayout = itemView.findViewById(R.id.constLayout)
             isSelected = false

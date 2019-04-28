@@ -46,7 +46,7 @@ class ShoppingListAdapter(private var shoppingLists: List<ShoppingList>,
     inner class ShoppingListViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.shopping_list, parent, false)) {
 
-        private var txtShoppingListName: TextView = itemView.findViewById(R.id.txtShoppingListName)
+        private var txtShoppingListName: TextView = itemView.findViewById(R.id.txtProductName)
         private var rvProducts: RecyclerView = itemView.findViewById(R.id.rvProducts)
         private var constLayout: ConstraintLayout = itemView.findViewById(R.id.constLayout)
 

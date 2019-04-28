@@ -5,5 +5,6 @@ import com.chibatching.kotpref.KotprefModel
 object UserInfo : KotprefModel() {
     var isLogged by booleanPref()
     var username by stringPref()
+    var fcmToken by stringPref()
     var id by longPref()
 }
