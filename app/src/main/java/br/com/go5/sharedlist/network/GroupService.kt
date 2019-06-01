@@ -17,4 +17,8 @@ interface GroupService {
     fun create(
         @Query("nome") name: String,
         @Query("idCriador") creator: Long): Call<Group>
+
+    @PUT("/groups/{id}/")
+    fun addUsersToGroup(@Path("id") groupId: Long,
+                        @Query("userEmail") userEmail: String): Call<Group>
 }

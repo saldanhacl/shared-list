@@ -24,6 +24,10 @@ class GroupViewModel: ViewModel(), KoinComponent {
         return groupRepository.createInServer(groupName, creator)
     }
 
+    fun addUserToGroup(groupId: Long, userEmail: String): LiveData<Group> {
+        return groupRepository.addUserToGroup(groupId, userEmail)
+    }
+
     fun findAllByUser(userId: Long): LiveData<List<Group>>? {
         return groupRepository.findAllByUser(userId)
     }

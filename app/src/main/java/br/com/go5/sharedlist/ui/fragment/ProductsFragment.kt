@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import br.com.go5.sharedlist.R
+import br.com.go5.sharedlist.data.model.Category
 import br.com.go5.sharedlist.data.model.Product
 import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
 import br.com.go5.sharedlist.persistence.UserInfo
@@ -24,12 +25,19 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.android.synthetic.main.activity_add_product.*
 import kotlinx.android.synthetic.main.fragment_products.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.Arrays.asList
+import org.angmarch.views.NiceSpinner
+import java.util.*
+
 
 class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
 
     private lateinit var selectedProduct: Product
+    private lateinit var categories: List<Category>
+    private lateinit var categoriesNames: MutableList<String>
     private var count: Long = 55L
 
     override fun onSelect(position: Int, showMenu: Boolean) {
@@ -55,6 +63,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        categoriesNames = mutableListOf()
         setupListeners()
     }
 
@@ -62,32 +71,62 @@ class ProductsFragment : Fragment(), ProductAdapter.OnItemSelected {
         fabAdd.setOnClickListener {
             MaterialDialog(activity!!).show {
                 customView(R.layout.layout_create_product)
+                val niceSpinner = this.getCustomView().findViewById(R.id.categorySpinner) as NiceSpinner
+                val dataset = LinkedList(categoriesNames)
+                if (dataset.size > 0) {
+                    niceSpinner.attachDataSource<String>(dataset)
+                }
                 title(text = "Criar Produto")
                 positiveButton {
                     val view = it.getCustomView()
                     val productNameInput: TextInputEditText = view.findViewById(R.id.txtProductName)
-                    val productPriceINput: TextInputEditText = view.findViewById(R.id.txtPrice)
-                    adapter.setNewData(listOf(Product(count++, productNameInput.text.toString(),
-                        productPriceINput.text.toString().toDouble())))
+                    val productPriceInput: TextInputEditText = view.findViewById(R.id.txtPrice)
+                    val niceSpinner = this.getCustomView().findViewById(R.id.categorySpinner) as NiceSpinner
+                    niceSpinner.selectedIndex
+                    createProduct((Product(count++, productNameInput.text.toString(),
+                        productPriceInput.text.toString().toDouble(), categories[niceSpinner.selectedIndex].id)))
                 }
             }
         }
     }
 
+    private fun createProduct(product: Product) {
+        viewModel.addProduct(product).observe(this, Observer<Product> {
+            if (it != null){
+                print(it)
+            }
+        })
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_products, container, false)
-
+        getCategories()
         setupUi(view)
 
-//        viewModel.findAll().observe(this, Observer {
-            products = listOf(
-                Product(123, "Banana", 3.99),
-                            Product(1234, "Maçã", 2.99)
-            )
-            adapter.setNewData(products)
-//        })
+        viewModel.findAll().observe(this, Observer {
+            if (!it.isNullOrEmpty()) {
+                adapter.setNewData(it)
+            }
+        })
 
         return view
+    }
+
+    private fun getCategories() {
+        viewModel.getAllCategories().observe(this, Observer<List<Category>> {
+            if (!it.isNullOrEmpty()){
+                categories = it
+                extractCategoryNames(categories)
+            }
+        })
+    }
+
+    private fun extractCategoryNames(categories: List<Category>) {
+        val names: MutableList<String> = mutableListOf()
+        categories.forEach {
+            names.add(it.name)
+        }
+        categoriesNames = names
     }
 
     private fun setupUi(view: View) {

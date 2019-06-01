@@ -90,4 +90,23 @@ class GroupRepository: KoinComponent {
         }
         return data
     }
+
+    fun addUserToGroup(groupId: Long, userEmail: String): LiveData<Group> {
+        val data = MutableLiveData<Group>()
+        if (utils.isConnectedToInternet()) {
+            retrofit.groupService().addUsersToGroup(groupId, userEmail).enqueue(
+                object : Callback<Group> {
+                    override fun onFailure(call: Call<Group>, t: Throwable) {
+                        data.value = null
+                    }
+
+                    override fun onResponse(call: Call<Group>, response: Response<Group>) {
+                        data.value = response.body()
+                    }
+
+                }
+            )
+        }
+        return data
+    }
 }

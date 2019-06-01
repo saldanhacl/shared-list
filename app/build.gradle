@@ -91,5 +91,13 @@ dependencies {
     // FAB
     implementation 'com.getbase:floatingactionbutton:1.10.1'
 
+    // Spinner
+    implementation 'com.github.arcadefire:nice-spinner:1.4'
+
+    // Chips
+    implementation "com.hootsuite.android:nachos:1.1.1"
+
+
+
 
 }

@@ -3,7 +3,9 @@ package br.com.go5.sharedlist.data.viewmodel
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import br.com.go5.sharedlist.data.model.Category
 import br.com.go5.sharedlist.data.model.Product
+import br.com.go5.sharedlist.data.repository.CategoryRepository
 import br.com.go5.sharedlist.data.repository.ProductRepository
 import br.com.go5.sharedlist.di.SharedListApplication
 import org.koin.standalone.KoinComponent
@@ -12,6 +14,7 @@ import org.koin.standalone.inject
 class ProductViewModel: ViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
+    private val categoryRepository: CategoryRepository by inject()
     private var products: LiveData<List<Product>>
 
     init {
@@ -30,5 +33,12 @@ class ProductViewModel: ViewModel(), KoinComponent {
         return this.products
     }
 
+    fun getAllCategories(): LiveData<List<Category>> {
+        return categoryRepository.getAll()
+    }
+
+    fun addProduct(product: Product): LiveData<Product> {
+        return productRepository.addProduct(product)
+    }
 
 }

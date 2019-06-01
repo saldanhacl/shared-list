@@ -1,14 +1,8 @@
 package br.com.go5.sharedlist.di
 
 import androidx.room.Room
-import br.com.go5.sharedlist.data.repository.CategoryRepository
-import br.com.go5.sharedlist.data.repository.GroupRepository
-import br.com.go5.sharedlist.data.repository.ProductRepository
-import br.com.go5.sharedlist.data.repository.ShoppingListRepository
-import br.com.go5.sharedlist.data.viewmodel.CategoryViewModel
-import br.com.go5.sharedlist.data.viewmodel.GroupViewModel
-import br.com.go5.sharedlist.data.viewmodel.ProductViewModel
-import br.com.go5.sharedlist.data.viewmodel.ShoppingListViewModel
+import br.com.go5.sharedlist.data.repository.*
+import br.com.go5.sharedlist.data.viewmodel.*
 import br.com.go5.sharedlist.network.RetrofitInit
 import br.com.go5.sharedlist.persistence.AppDatabase
 import br.com.go5.sharedlist.utils.Utils
@@ -21,6 +15,7 @@ val appModule: Module = module {
     single { SharedListApplication() }
     single { RetrofitInit() }
     single { Utils(get()) }
+    viewModel { LoginViewModel() }
     viewModel { ProductViewModel() }
     viewModel { GroupViewModel() }
     viewModel { ShoppingListViewModel() }
@@ -34,6 +29,7 @@ val appModule: Module = module {
     single { GroupRepository() }
     single { ShoppingListRepository() }
     single { CategoryRepository() }
+    single { UserRepository() }
 }
 
 val viewModelModule: Module = module {

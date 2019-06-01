@@ -26,7 +26,11 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemSwipeListener
 import com.google.android.material.textfield.TextInputLayout
+import com.hootsuite.nachos.NachoTextView
 import kotlinx.android.synthetic.main.fragment_groups.*
+import android.widget.ArrayAdapter
+import com.hootsuite.nachos.terminator.ChipTerminatorHandler
+
 
 class GroupsFragment : Fragment()  {
 
@@ -107,22 +111,37 @@ class GroupsFragment : Fragment()  {
         fabAdd.setOnClickListener {
             MaterialDialog(activity!!).show {
                 customView(R.layout.layout_create_group)
+                val usersEmailsChips: NachoTextView = this.getCustomView().findViewById(R.id.users_email_chips)
+                val adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_dropdown_item_1line)
+                usersEmailsChips.addChipTerminator('\n', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL)
+                usersEmailsChips.setAdapter(adapter)
                 title(R.string.create_group_card_title)
                 positiveButton {
                     val view = it.getCustomView()
                     val groupNameInput: TextInputLayout = view.findViewById(R.id.txtGroupName)
-                    createGroup(groupNameInput.editText?.text.toString(), UserInfo.id)
+                    if (usersEmailsChips.chipValues.size > 0) {
+                        createGroup(groupNameInput.editText?.text.toString(), UserInfo.id, usersEmailsChips.chipValues)
+                    }
+                    createGroup(groupNameInput.editText?.text.toString(), UserInfo.id, null)
                 }
             }
         }
     }
 
-    private fun createGroup(groupName: String, creator: Long) {
+    private fun createGroup(
+        groupName: String, creator: Long, chipValues: MutableList<String>?) {
         viewModel.createInServer(groupName, creator).observe(activity!!, Observer {
             if (it == null) {
                 showAlertDialog(getString(R.string.server_error))
+            } else {
+                getGroups()
+                val groupId = it.id
+                chipValues?.forEach {
+                    viewModel.addUserToGroup(groupId, it).observe(activity!!, Observer {
+                        getGroups()
+                    })
+                }
             }
-            getGroups()
         })
     }
 

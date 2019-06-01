@@ -1,6 +1,7 @@
 package br.com.go5.sharedlist.network
 
 import androidx.lifecycle.LiveData
+import br.com.go5.sharedlist.data.model.ApiResponse
 import br.com.go5.sharedlist.data.model.Group
 import br.com.go5.sharedlist.data.model.User
 import kotlinx.coroutines.Deferred
@@ -13,7 +14,7 @@ interface UserService {
     fun login(
         @Query("email") email: String,
         @Query("senha") password: String,
-        @Query("FCMToken") FCMToken: String): Deferred<User>
+        @Query("FCMToken") FCMToken: String): Call<User>
 
     @GET("/users/{id}/groups")
     fun getGroups(@Path("id") userId: Long): Call<List<Group>>

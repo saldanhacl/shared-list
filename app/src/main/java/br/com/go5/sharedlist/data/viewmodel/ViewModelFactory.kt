@@ -14,6 +14,8 @@ class ViewModelFactory: ViewModelProvider.Factory {
                     ShoppingListViewModel()
                 isAssignableFrom(CategoryViewModel::class.java) ->
                     CategoryViewModel()
+                isAssignableFrom(LoginViewModel::class.java) ->
+                    LoginViewModel()
                 else ->
                     throw IllegalArgumentException("Classe desconhecida.")
             }

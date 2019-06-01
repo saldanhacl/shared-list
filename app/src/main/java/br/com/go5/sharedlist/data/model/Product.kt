@@ -11,7 +11,8 @@ data class Product (
     @SerializedName("nome")
     val name: String,
     @SerializedName("preco")
-    val price: Double
+    val price: Double,
+    val categoryId: Long
 ) {
     fun getPriceString(): String {
         return price.toString()
